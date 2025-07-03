@@ -1,0 +1,8 @@
+[package]
+name = "specdb-query"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# async-graphql = "7.0.17"
+specdb = {path = "../specdb-rs"}
