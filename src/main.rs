@@ -1,11 +1,25 @@
 use std::sync::Arc;
 
+use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
+use async_graphql_axum::GraphQL;
 use axum::{
-    extract::State, routing::get, Json, Router
+    extract::State, routing::get, Json, Router, response::{self, IntoResponse}
 };
 use serde::{Serialize};
-use specdb::{get_spec_db, SpecDb};
+use specdb::{get_spec_db, SpecDb, SpecDbStruct};
 use tower_http::trace::TraceLayer;
+
+pub struct QueryRoot;
+
+#[async_graphql::Object]
+impl QueryRoot {
+    async fn spec_db<'a>(
+        &self,
+        ctx: &Context<'a>,
+    ) -> &'a Vec<SpecDbStruct> {
+        return &ctx.data_unchecked::<SpecDb>().files;
+    }
+}
 
 struct AppState {
     spec_db: SpecDb
@@ -18,6 +32,10 @@ async fn handler(
     return Json(state.spec_db.clone());
 }
 
+async fn graphiql() -> impl IntoResponse {
+    response::Html(GraphiQLSource::build().endpoint("/graphql").finish())
+}
+
 #[tokio::main]
 async fn main() {
     let spec_db = get_spec_db("/home/smear/personal/SpecDB/specs".to_string());
@@ -25,12 +43,16 @@ async fn main() {
     .with_max_level(tracing::Level::DEBUG)
     .init();
     let shared_state = Arc::new(AppState { spec_db });
+    let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+        .data(get_spec_db("/home/smear/personal/SpecDB/specs".to_string()))
+        .finish();
     
     // println!("Files parsed total: {}", spec_db.files.iter().count());
 
     // build our application with a single route
-    let app = Router::new().route("/", get(handler).with_state(shared_state))
-    .layer(TraceLayer::new_for_http());
+    let app = Router::new().route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
+        .route("/", get(handler).with_state(shared_state))
+        .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8082").await.unwrap();
