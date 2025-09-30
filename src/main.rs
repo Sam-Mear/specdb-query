@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use specdb_query::{get_query_state, queries::search, AppState};
+use specdb_query::{get_query_state, queries::{search, full_specs}, AppState};
 use axum::extract::Path;
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_axum::GraphQL;
@@ -62,6 +62,7 @@ async fn main() {
     let app = Router::new().route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
         .route("/", get(handler).with_state(shared_state.clone()))
         .route("/search/{query}", get(search::search_handler).with_state(shared_state.clone()))
+        .route("/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082
