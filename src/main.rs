@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use specdb_query::{queries::search, AppState};
+use specdb_query::{get_query_state, queries::search, AppState};
 use axum::extract::Path;
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_axum::GraphQL;
@@ -47,10 +47,11 @@ async fn graphiql() -> impl IntoResponse {
 #[tokio::main]
 async fn main() {
     let spec_db = get_spec_db("/home/smear/personal/SpecDB/specs".to_string());
+    let query_state = get_query_state(&spec_db);
     tracing_subscriber::fmt()
     .with_max_level(tracing::Level::DEBUG)
     .init();
-    let shared_state = Arc::new(AppState { spec_db });
+    let shared_state = Arc::new(AppState { spec_db, query_state });
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(get_spec_db("/home/smear/personal/SpecDB/specs".to_string()))
         .finish();
