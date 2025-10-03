@@ -24,10 +24,10 @@ pub async fn handler(
 {
     return Json(state.query_state.spec_hash_map.get(&name).cloned());
 }
-// pub async fn handler(
-//     State(state): State<Arc<AppState>>,
-//     Path(name): Path<String>
-// ) -> Json<String>
-// {
-//     return Json(name);
-// }
+
+pub async fn handler_root(
+    State(state): State<Arc<AppState>>
+) -> Json<Option<SpecDbStruct>>
+{
+    return Json(state.query_state.spec_hash_map.get("Root").cloned());
+}

@@ -60,7 +60,7 @@ async fn main() {
 
     // build our application with a single route
     let app = Router::new().route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
-        .route("/", get(handler).with_state(shared_state.clone()))
+        .route("/", get(full_specs::handler_root).with_state(shared_state.clone()))
         .route("/search/{query}", get(search::search_handler).with_state(shared_state.clone()))
         .route("/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))
         .layer(TraceLayer::new_for_http());
