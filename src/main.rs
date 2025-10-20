@@ -46,14 +46,14 @@ async fn graphiql() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() {
-    let spec_db = get_spec_db("/home/smear/personal/SpecDB/specs".to_string());
+    let spec_db = get_spec_db("/home/amear/personal/SpecDB/specs".to_string());
     let query_state = get_query_state(&spec_db);
     tracing_subscriber::fmt()
     .with_max_level(tracing::Level::DEBUG)
     .init();
-    let shared_state = Arc::new(AppState { spec_db, query_state });
+    let shared_state = Arc::new(AppState { spec_db: spec_db.clone(), query_state });
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
-        .data(get_spec_db("/home/smear/personal/SpecDB/specs".to_string()))
+        .data(spec_db)
         .finish();
     
     // println!("Files parsed total: {}", spec_db.files.iter().count());
