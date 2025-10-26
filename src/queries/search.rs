@@ -14,14 +14,13 @@ pub struct PreProcessedState {
 #[derive(serde::Serialize, Clone)]
 pub struct SearchResult {
     name: String,
-    human_name: String,
 }
 
 pub fn get_state(specdb: &SpecDb) -> Vec<PreProcessedState>
 {
     let mut result = Vec::<PreProcessedState>::new();
     for spec in &specdb.files {
-        result.push(PreProcessedState { name: strip_string(&spec.name), result: SearchResult { name: spec.name.clone(), human_name: spec.name.clone() } } ); 
+        result.push(PreProcessedState { name: strip_string(&spec.name), result: SearchResult { name: spec.name.clone() } } ); 
     }
     return result;
     

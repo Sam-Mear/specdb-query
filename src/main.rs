@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use directories::ProjectDirs;
 use specdb_query::{get_query_state, queries::{search, full_specs}, AppState};
 use axum::extract::Path;
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
@@ -10,8 +11,13 @@ use regex::{Regex, RegexBuilder};
 use serde::{Serialize};
 use specdb::{get_spec_db, spectype::Cpu, SpecDb, SpecDbStruct};
 use tower_http::trace::TraceLayer;
+use yaml_rust2::YamlLoader;
 
 pub struct QueryRoot;
+
+struct Configuration {
+    spec_db_path: String,
+}
 
 #[async_graphql::Object]
 impl QueryRoot {
@@ -46,7 +52,9 @@ async fn graphiql() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() {
-    let spec_db = get_spec_db("/home/amear/personal/SpecDB/specs".to_string());
+    let config = read_config();
+
+    let spec_db = get_spec_db(config.spec_db_path);
     let query_state = get_query_state(&spec_db);
     tracing_subscriber::fmt()
     .with_max_level(tracing::Level::DEBUG)
@@ -68,4 +76,29 @@ async fn main() {
     // run our app with hyper, listening globally on port 8082
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8082").await.unwrap();
     axum::serve(listener, app).await.unwrap();
+}
+
+fn read_config() -> Configuration
+{
+    if let Some(proj_dirs) = ProjectDirs::from("info", "SpecDB",  "SpecDB Query API") {
+        let config = proj_dirs.config_dir();
+        if !config.exists() {
+            std::fs::create_dir_all(config).unwrap();
+        }
+        let config_file = config.join("config.yaml");
+        if !config_file.exists() {
+            std::fs::write(&config_file, "").unwrap();
+        }
+
+        let yaml = YamlLoader::load_from_str(std::fs::read_to_string(&config_file).unwrap().as_str()).unwrap();
+        if yaml.len() == 0 {
+            panic!("Config file at {} is empty", config_file.display());
+        }
+
+        return Configuration {
+            spec_db_path: yaml[0]["spec_db_path"].as_str()
+                .expect(format!("spec_db_path not found in config file at {}", config_file.display()).as_str()).to_string(),
+        };
+    }
+    panic!("Could not determine configuration directory");
 }
