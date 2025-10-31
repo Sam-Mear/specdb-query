@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package specs;
+
+message SearchResult {
+    string name = 1;
+    SpecType spec_type = 2;
+    optional string human_name = 3;
+}
+
+enum SpecType {
+    SPEC_TYPE_CPU = 0;
+    SPEC_TYPE_APU = 1;
+    SPEC_TYPE_GRAPHICS_CARD = 2;
+    SPEC_TYPE_CPU_ARCHITECTURE = 3;
+    SPEC_TYPE_APU_ARCHITECTURE = 4;
+    SPEC_TYPE_GRAPHICS_ARCHITECTURE = 5;
+    SPEC_TYPE_GENERIC_CONTAINER = 6;
+    SPEC_TYPE_HIDDEN = 7;
+}
+
+
+// Wrapper message for returning a list of SearchResult
+message SearchResultList {
+    repeated SearchResult results = 1;
+}

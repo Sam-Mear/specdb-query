@@ -1,0 +1,19 @@
+{
+    "name": "amear/php",
+    "autoload": {
+        "psr-4": {
+            "Amear\\Php\\": "src/",
+            "SpecDb\\": "specs/SpecDb"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sam Mear",
+            "email": "sam.mear@brandaddition.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.10",
+        "google/protobuf": "^4.33"
+    }
+}

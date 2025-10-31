@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use directories::ProjectDirs;
-use specdb_query::{get_query_state, queries::{search, full_specs}, AppState};
+use specdb_query::{AppState, get_query_state, queries::{full_specs, protobuf, search}};
 use axum::extract::Path;
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_axum::GraphQL;
@@ -70,6 +70,7 @@ async fn main() {
     let app = Router::new().route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
         .route("/", get(full_specs::handler_root).with_state(shared_state.clone()))
         .route("/v1/search/{query}", get(search::search_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/search/{query}", get(specdb_query::queries::protobuf::search::search_handler).with_state(shared_state.clone()))
         .route("/v1/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))
         .layer(TraceLayer::new_for_http());
 
