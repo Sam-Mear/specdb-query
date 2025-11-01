@@ -5,10 +5,17 @@ use crate::queries::search::{PreProcessedState};
 
 pub mod queries;
 
+pub mod proto_specdb {
+    pub mod cpu {
+        include!(concat!(env!("OUT_DIR"), "/specdb.cpu.rs"));
+    }
+}
+
 pub struct QueryState {
     pub stripped_names: Vec<PreProcessedState>,
     pub spec_hash_map: RapidHashMap<String, specdb::SpecDbStruct>,
     pub stripped_names_protobuf: Vec<crate::queries::protobuf::search::PreProcessedState>,
+    pub protobuf_cpu_hashmap: RapidHashMap<String, proto_specdb::cpu::Cpu>,
 }
 
 pub struct AppState {
@@ -21,5 +28,6 @@ pub fn get_query_state(specdb: &SpecDb) -> QueryState
     let stripped_names = crate::queries::search::get_state(&specdb);
     let spec_hash_map = crate::queries::full_specs::get_state(&specdb);
     let stripped_names_protobuf = crate::queries::protobuf::search::get_state(&specdb);
-    return QueryState { stripped_names, spec_hash_map, stripped_names_protobuf };
+    let protobuf_cpu_hashmap = crate::queries::protobuf::cpu::get_state(&specdb);
+    return QueryState { stripped_names, spec_hash_map, stripped_names_protobuf, protobuf_cpu_hashmap };
 }
