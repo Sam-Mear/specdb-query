@@ -1,4 +1,4 @@
-`protoc --php_out=specs cpu.proto`
+`protoc --php_out=specs query.proto`
 
 // if response is not 200, the api might return a different message 
 

@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package specdb.query;
+
+option php_namespace = "SpecDb\\Query";
+option php_metadata_namespace = "SpecDb\\Metadata";
+
+
+// /v1/protobuf/search/{query}
+message SearchResultList {
+    repeated SearchResult results = 1;
+}
+
+message SearchResult {
+    string name = 1;
+    SpecType spec_type = 2;
+    optional string human_name = 3;
+}
+
+enum SpecType {
+    SPEC_TYPE_CPU = 0;
+    SPEC_TYPE_APU = 1;
+    SPEC_TYPE_GRAPHICS_CARD = 2;
+    SPEC_TYPE_CPU_ARCHITECTURE = 3;
+    SPEC_TYPE_APU_ARCHITECTURE = 4;
+    SPEC_TYPE_GRAPHICS_ARCHITECTURE = 5;
+    SPEC_TYPE_GENERIC_CONTAINER = 6;
+    SPEC_TYPE_HIDDEN = 7;
+}
+
+// /v1/protobuf/graphics_card/{query}
+message GraphicsCard {  
+    string vram_capacity = 1;
+    uint32 shader_processor_count = 2;
+    string gpu_base_frequency = 3;
+
+    optional string manufacturer = 4;
+    optional string vendor = 5;
+    repeated string market = 6;
+    optional string architecture = 7;
+    optional string lithography = 8;
+    optional string release_date = 9;
+
+    optional string direct_x_support = 10;
+    optional string open_gl_support = 11;
+    optional string open_cl_support = 12;
+    optional string vulkan_support = 13;
+
+    optional string vram_frequency = 14;
+    optional string vram_type = 15;
+    optional string vram_bandwidth = 16;
+    optional string vram_bus_width = 17;
+
+    optional uint32 render_output_unit_count = 18;
+    optional uint32 texture_mapping_unit_count = 19;
+
+    optional string die_size = 20;
+    optional string tdp = 21;
+
+    optional string gpu = 22;
+    optional string gpu_variant = 23;
+    optional string gpu_model = 24;
+
+    optional string hlsl_shader_model = 25;
+    optional string gpu_boost_frequency = 26;
+
+    optional string fp32_compute = 27;
+    optional string fp64_compute = 28;
+
+    optional string slot_width = 29;
+    repeated string outputs = 30;
+    repeated string power_connectors = 31;
+
+    optional string length = 32;
+    optional string height = 33;
+    optional string width = 34;
+
+    optional uint32 ray_tracing_cores = 35;
+    optional uint32 tensor_cores = 36;
+
+    repeated string hardware_accelerated_encoding = 37;
+    repeated string hardware_accelerated_decoding = 38;
+
+    optional string module_count = 39;
+    optional uint32 pixel_shaders = 40;
+    optional string maximum_vram_capacity = 41;
+    optional string max_displays = 42;
+
+    optional string crossfire_support = 43;
+    optional string free_sync_support = 44;
+}
+
+// /v1/protobuf/cpu/{query}
+message Cpu {
+    uint32 core_count = 1;
+    uint32 thread_count = 2;
+    string base_frequency = 3;
+    string tdp = 4;
+
+    // CPU Specific
+    optional string boost_frequency = 5;
+    optional string xfr_frequency = 6;
+    optional string socket = 7;
+    optional string stepping = 8;
+    optional string l1_cache_data = 9;
+    optional string l1_cache_instruction = 10;
+    optional string l2_cache_total = 11;
+    optional string l3_cache_total = 12;
+    optional string memory_type = 13;
+
+    optional uint32 pcie_5_0_lanes = 14;
+    optional uint32 pcie_4_0_lanes = 15;
+    optional uint32 pcie_3_0_lanes = 16;
+    optional uint32 pcie_2_0_lanes = 17;
+    optional uint32 pcie_1_0_lanes = 18;
+
+    optional string avx_sse_mmx = 19;
+    optional bool fma4 = 20;
+    optional bool fma3 = 21;
+    optional string bmi = 22;
+    optional bool aes = 23;
+    optional bool sha = 24;
+    repeated string other_extensions = 25;
+    optional bool unlocked = 26;
+    optional bool xfr_support = 27;
+
+    optional string max_memory_channels = 28;
+    optional string max_memory_frequency = 29;
+    repeated string compatable_chipsets = 30;
+
+    // Hybrid architecture details
+    optional string performance_core_base_frequency = 31;
+    optional string efficient_core_base_frequency = 32;
+    optional string performance_core_boost_frequency = 33;
+    optional string efficient_core_boost_frequency = 34;
+    optional uint32 performance_core_count = 35;
+    optional uint32 efficient_core_count = 36;
+    optional uint32 performance_thread_count = 37;
+    optional uint32 efficient_thread_count = 38;
+    optional bool ctdp_support = 39;
+    optional string efficient_core_architecture = 40;
+
+    // Shared
+    optional string manufacturer = 41;
+    repeated string market = 42;
+    optional string architecture = 43;
+    optional string lithography = 44;
+    optional string release_date = 45;
+}
+

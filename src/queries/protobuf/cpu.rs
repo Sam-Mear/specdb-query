@@ -6,12 +6,12 @@ use rapidhash::{HashMapExt, RapidHashMap};
 use specdb::{SpecDb, SpecDbStruct, spectype::Type};
 use axum_extra::protobuf::Protobuf;
 
-pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::cpu::Cpu>
+pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::Cpu>
 {
-    let mut map = RapidHashMap::<String, proto_specdb::cpu::Cpu>::new();
+    let mut map = RapidHashMap::<String, proto_specdb::query::Cpu>::new();
     for spec in &specdb.files {
         let proto_spec = match &spec.part_type {
-            Type::Cpu(cpu) => Some(proto_specdb::cpu::Cpu {
+            Type::Cpu(cpu) => Some(proto_specdb::query::Cpu {
                 core_count: cpu.core_count.0 as u32,
                 thread_count: cpu.thread_count.0 as u32,
                 base_frequency: cpu.base_frequency.0.clone(),
@@ -75,31 +75,11 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::cpu::Cpu
     
 }
 
-// #[axum::debug_handler]
-// pub async fn search_handler(
-//     State(state): State<Arc<AppState>>,
-//     Path(query): Path<String>
-// ) -> Protobuf<SearchResultList>
-// {
-//     // could pre-process the state.spec_db.files to have a stripped version of the name for searching
-//     let query_stripped = strip_string(&query);
-
-
-//     let mut result = Vec::<SearchResult>::new();
-//     for spec in &state.query_state.stripped_names_protobuf {
-//         // if re.is_match(&spec.name) {
-//         if spec.stripped_search_name.contains(&query_stripped) {
-//             result.push(spec.result.clone());
-//         }
-//     }
-//     return Protobuf(SearchResultList { results: result });
-// }
-
 #[axum::debug_handler]
 pub async fn handler(
     State(state): State<Arc<AppState>>,
     Path(name): Path<String>,
-) -> Result<Protobuf<proto_specdb::cpu::Cpu>, StatusCode> {
+) -> Result<Protobuf<proto_specdb::query::Cpu>, StatusCode> {
     match state.query_state.protobuf_cpu_hashmap.get(&name) {
         Some(value) => Ok(Protobuf(value.clone())),
         None => Err(StatusCode::NOT_FOUND),

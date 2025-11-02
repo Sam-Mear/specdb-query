@@ -73,6 +73,7 @@ async fn main() {
         .route("/v1/protobuf/search/{query}", get(specdb_query::queries::protobuf::search::search_handler).with_state(shared_state.clone()))
         .route("/v1/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))
         .route("/v1/protobuf/cpu/{query}", get(specdb_query::queries::protobuf::cpu::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/graphics_card/{query}", get(specdb_query::queries::protobuf::graphics_card::handler).with_state(shared_state.clone()))
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082
