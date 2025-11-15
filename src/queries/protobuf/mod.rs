@@ -2,3 +2,8 @@ pub mod search;
 pub mod cpu;
 pub mod graphics_card;
 pub mod apu;
+pub mod cpu_architecture;
+pub mod graphics_architecture;
+pub mod apu_architecture;
+pub mod generic_container;
+pub mod search_result_full;

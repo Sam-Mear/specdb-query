@@ -18,6 +18,10 @@ pub struct QueryState {
     pub protobuf_cpu_hashmap: RapidHashMap<String, proto_specdb::query::Cpu>,
     pub protobuf_graphics_card_hashmap: RapidHashMap<String, proto_specdb::query::GraphicsCard>,
     pub protobuf_apu_hashmap: RapidHashMap<String, proto_specdb::query::Apu>,
+    pub protobuf_cpu_architecture_hashmap: RapidHashMap<String, proto_specdb::query::CpuArchitecture>,
+    pub protobuf_graphics_architecture_hashmap: RapidHashMap<String, proto_specdb::query::GraphicsArchitecture>,
+    pub protobuf_apu_architecture_hashmap: RapidHashMap<String, proto_specdb::query::ApuArchitecture>,
+    pub protobuf_generic_container_hashmap: RapidHashMap<String, proto_specdb::query::GenericContainer>,
 }
 
 pub struct AppState {
@@ -27,11 +31,16 @@ pub struct AppState {
 
 pub fn get_query_state(specdb: &SpecDb) -> QueryState
 {
-    let stripped_names = crate::queries::search::get_state(&specdb);
-    let spec_hash_map = crate::queries::full_specs::get_state(&specdb);
-    let stripped_names_protobuf = crate::queries::protobuf::search::get_state(&specdb);
-    let protobuf_cpu_hashmap = crate::queries::protobuf::cpu::get_state(&specdb);
-    let protobuf_graphics_card_hashmap = crate::queries::protobuf::graphics_card::get_state(&specdb);
-    let protobuf_apu_hashmap = crate::queries::protobuf::apu::get_state(&specdb);
-    return QueryState { stripped_names, spec_hash_map, stripped_names_protobuf, protobuf_cpu_hashmap, protobuf_graphics_card_hashmap, protobuf_apu_hashmap };
+    return QueryState {
+        stripped_names: crate::queries::search::get_state(&specdb),
+        spec_hash_map: crate::queries::full_specs::get_state(&specdb),
+        stripped_names_protobuf: crate::queries::protobuf::search::get_state(&specdb),
+        protobuf_cpu_hashmap: crate::queries::protobuf::cpu::get_state(&specdb),
+        protobuf_graphics_card_hashmap: crate::queries::protobuf::graphics_card::get_state(&specdb),
+        protobuf_apu_hashmap: crate::queries::protobuf::apu::get_state(&specdb),
+        protobuf_cpu_architecture_hashmap: crate::queries::protobuf::cpu_architecture::get_state(&specdb),
+        protobuf_graphics_architecture_hashmap: crate::queries::protobuf::graphics_architecture::get_state(&specdb),
+        protobuf_apu_architecture_hashmap: crate::queries::protobuf::apu_architecture::get_state(&specdb),
+        protobuf_generic_container_hashmap: crate::queries::protobuf::generic_container::get_state(&specdb),
+    }
 }

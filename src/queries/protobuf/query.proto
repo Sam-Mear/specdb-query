@@ -17,6 +17,26 @@ message SearchResult {
     optional string human_name = 3;
 }
 
+// /v1/protobuf/search_full_specs/{query}
+message SearchResultFullList {
+    repeated SearchResultFull search_result_full = 1;
+}
+
+message SearchResultFull {
+    string name = 1;
+    optional string human_name = 2;
+    oneof full_specs {
+        GraphicsCard graphics_card = 3;
+        Cpu cpu = 4;
+        Apu apu = 5;
+        CpuArchitecture cpu_architecture = 6;
+        ApuArchitecture apu_architecture = 7;
+        GraphicsArchitecture graphics_architecture = 8;
+        GenericContainer generic_container = 9;
+        bool hidden = 10;
+    }
+}
+
 enum SpecType {
     SPEC_TYPE_CPU = 0;
     SPEC_TYPE_APU = 1;
@@ -148,6 +168,7 @@ message Cpu {
     optional string release_date = 45;
 }
 
+// /v1/protobuf/apu/{query}
 message Apu {
     
     uint32 core_count = 1;
@@ -229,3 +250,38 @@ message Apu {
     optional string free_sync_support = 66;
 }
 
+// /v1/protobuf/cpu_architecture/{query}
+message CpuArchitecture {
+    repeated Section sections = 1;
+    string lithography = 2;
+    string release_date = 3;
+    repeated string sockets = 4;
+}
+
+// /v1/protobuf/graphics_architecture/{query}
+message GraphicsArchitecture {
+    repeated Section sections = 1;
+    string lithography = 2;
+    string release_date = 3;
+    optional string direct_x_support = 4;
+    optional string vulkan_support = 5;
+    optional string manufacturer = 6;
+}
+
+// /v1/protobuf/apu_architecture/{query}
+message ApuArchitecture {
+    repeated Section sections = 1;
+    string lithography = 2;
+    string release_date = 3;
+}
+
+// /v1/protobuf/generic_container/{query}
+message GenericContainer {
+    string top_header = 1;
+    repeated Section sections = 2;
+}
+
+message Section {
+    string header = 1;
+    repeated string members = 2;
+}

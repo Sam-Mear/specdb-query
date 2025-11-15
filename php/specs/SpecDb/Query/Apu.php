@@ -9,6 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * /v1/protobuf/apu/{query}
+ *
  * Generated from protobuf message <code>specdb.query.Apu</code>
  */
 class Apu extends \Google\Protobuf\Internal\Message

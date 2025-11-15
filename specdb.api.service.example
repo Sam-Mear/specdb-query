@@ -1,0 +1,9 @@
+[Unit]
+Description=SpecDB Api Service
+[Service]
+User=specdb
+Group=specdb
+WorkingDirectory=/home/specdb/specdb-query/
+ExecStart=/home/specdb/specdb-query/target/release/specdb-query
+[Install]
+WantedBy=multi-user.target
