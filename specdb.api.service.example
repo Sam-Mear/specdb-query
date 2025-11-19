@@ -1,6 +1,10 @@
 [Unit]
 Description=SpecDB Api Service
+StartLimitIntervalSec=0
 [Service]
+Type=simple
+Restart=always
+RestartSec=1
 User=specdb
 Group=specdb
 WorkingDirectory=/home/specdb/specdb-query/
