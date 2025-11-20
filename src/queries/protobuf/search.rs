@@ -73,17 +73,63 @@ pub async fn search_handler(
     Path(query): Path<String>
 ) -> Protobuf<SearchResultList>
 {
-    // could pre-process the state.spec_db.files to have a stripped version of the name for searching
-    let query_stripped = strip_string(&query);
+    // support optional type filter by appending ":<type>" to the path query.
+    // Examples:
+    //   "ryzen"            -> search all types for "ryzen"
+    //   "ryzen:Cpu"        -> only Cpu results for "ryzen"
+    //   "ryzen:2"          -> only spec_type == 2 results for "ryzen"
+    let mut query_term = query.clone();
+    let mut filter_type: Option<i32> = None;
 
+    if let Some(idx) = query.rfind(':') {
+        let (left, right_with_colon) = query.split_at(idx);
+        let right = &right_with_colon[1..]; // skip the ':'
+        if !right.is_empty() {
+            // try numeric parse first, then match common enum names (case-insensitive)
+            if let Ok(n) = right.parse::<i32>() {
+                filter_type = Some(n);
+                query_term = left.to_string();
+            } else {
+                match right.to_ascii_lowercase().as_str() {
+                    "cpu" => { filter_type = Some(SpecType::Cpu as i32); query_term = left.to_string(); }
+                    "apu" => { filter_type = Some(SpecType::Apu as i32); query_term = left.to_string(); }
+                    "graphicscard" | "graphics_card" | "gpu" | "graphics" => {
+                        filter_type = Some(SpecType::GraphicsCard as i32); query_term = left.to_string();
+                    }
+                    "cpuarchitecture" | "cpu_architecture" => {
+                        filter_type = Some(SpecType::CpuArchitecture as i32); query_term = left.to_string();
+                    }
+                    "apuarchitecture" | "apu_architecture" => {
+                        filter_type = Some(SpecType::ApuArchitecture as i32); query_term = left.to_string();
+                    }
+                    "graphicsarchitecture" | "graphics_architecture" => {
+                        filter_type = Some(SpecType::GraphicsArchitecture as i32); query_term = left.to_string();
+                    }
+                    "genericcontainer" | "generic_container" => {
+                        filter_type = Some(SpecType::GenericContainer as i32); query_term = left.to_string();
+                    }
+                    "hidden" => { filter_type = Some(SpecType::Hidden as i32); query_term = left.to_string(); }
+                    _ => { /* not a type specifier; treat entire query as search term */ }
+                }
+            }
+        }
+    }
+
+    let query_stripped = strip_string(&query_term);
 
     let mut result = Vec::<SearchResult>::new();
     for spec in &state.query_state.stripped_names_protobuf {
-        // if re.is_match(&spec.name) {
         if spec.stripped_search_name.contains(&query_stripped) {
-            result.push(spec.result.clone());
+            if let Some(ft) = filter_type {
+                if spec.result.spec_type == ft {
+                    result.push(spec.result.clone());
+                }
+            } else {
+                result.push(spec.result.clone());
+            }
         }
     }
+
     return Protobuf(SearchResultList { results: result });
 }
 
