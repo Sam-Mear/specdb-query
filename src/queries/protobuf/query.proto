@@ -284,4 +284,13 @@ message GenericContainer {
 message Section {
     string header = 1;
     repeated string members = 2;
+    map<string, Extra> extras = 3;
+}
+
+message Extra {
+    oneof data_type{
+        string string_data = 101;
+        uint32 int_data = 102;
+        // repeated string repeated_string_data = 103 disabled for now 
+    }
 }
