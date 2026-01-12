@@ -5,6 +5,8 @@ use axum::{extract::{Path, State}, http::StatusCode};
 use rapidhash::{HashMapExt, RapidHashMap};
 use specdb::{SpecDb, spectype::Type};
 use axum_extra::protobuf::Protobuf;
+use std::collections::HashMap;
+use crate::proto_specdb::query::{SectionExtras};
 
 pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::Cpu>
 {
@@ -57,6 +59,7 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::C
                 architecture: match cpu.architecture.clone() { Some(value) => Some(value.0), None => None},
                 lithography: match cpu.lithography.clone() { Some(value) => Some(value.0), None => None},
                 release_date: match cpu.release_date.clone() { Some(value) => Some(value.0), None => None},
+                extras_by_section: HashMap::new(),
             }),
             Type::Apu(_apu) => None,
             Type::GraphicsCard(_graphics_card) => None,
@@ -81,7 +84,25 @@ pub async fn handler(
     Path(name): Path<String>,
 ) -> Result<Protobuf<proto_specdb::query::Cpu>, StatusCode> {
     match state.query_state.protobuf_cpu_hashmap.get(&name) {
-        Some(value) => Ok(Protobuf(value.clone())),
+        Some(value) => {
+            // clone base cpu proto and attach extras
+            let mut cpu = value.clone();
+
+            let outer = state.query_state.extras_map.read().await;
+            if let Some(spec_map) = outer.get(&name) {
+                let mut extras_by_section: HashMap<String, SectionExtras> = HashMap::new();
+                for (section, section_map) in spec_map.iter() {
+                    let mut s = SectionExtras { extras: HashMap::new() };
+                    for (k, v) in section_map.iter() {
+                        s.extras.insert(k.clone(), v.clone());
+                    }
+                    extras_by_section.insert(section.clone(), s);
+                }
+                cpu.extras_by_section = extras_by_section;
+            }
+
+            Ok(Protobuf(cpu))
+        }
         None => Err(StatusCode::NOT_FOUND),
     }
 }

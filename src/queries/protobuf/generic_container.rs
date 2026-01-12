@@ -43,7 +43,23 @@ pub async fn handler(
     Path(name): Path<String>,
 ) -> Result<Protobuf<proto_specdb::query::GenericContainer>, StatusCode> {
     match state.query_state.protobuf_generic_container_hashmap.get(&name) {
-        Some(value) => Ok(Protobuf(value.clone())),
+        Some(value) => {
+            // clone base and populate section extras
+            let mut container = value.clone();
+            let outer = state.query_state.extras_map.read().await;
+            if let Some(spec_map) = outer.get(&name) {
+                for section in container.sections.iter_mut() {
+                    if let Some(section_map) = spec_map.get(&section.header) {
+                        let mut extras: HashMap<String, Extra> = HashMap::new();
+                        for (k, v) in section_map.iter() {
+                            extras.insert(k.clone(), v.clone());
+                        }
+                        section.extras = extras;
+                    }
+                }
+            }
+            Ok(Protobuf(container))
+        }
         None => Err(StatusCode::NOT_FOUND),
     }
 }

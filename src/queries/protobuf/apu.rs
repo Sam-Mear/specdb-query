@@ -3,6 +3,8 @@ use std::sync::Arc;
 
 use axum::{extract::{Path, State}, http::StatusCode};
 use rapidhash::{HashMapExt, RapidHashMap};
+use std::collections::HashMap;
+use crate::proto_specdb::query::SectionExtras;
 use specdb::{SpecDb, spectype::Type};
 use axum_extra::protobuf::Protobuf;
 
@@ -12,7 +14,7 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::A
     for spec in &specdb.files {
         let proto_spec = match &spec.part_type {
             Type::Cpu(_cpu) => None,
-            Type::Apu(apu) => Some(proto_specdb::query::Apu {
+                Type::Apu(apu) => Some(proto_specdb::query::Apu {
                 core_count: apu.core_count.0 as u32,
                 thread_count: apu.thread_count.0 as u32,
                 base_frequency: apu.base_frequency.0.clone(),
@@ -59,6 +61,7 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::A
                 architecture: match apu.architecture.clone() { Some(value) => Some(value.0), None => None},
                 lithography: match apu.lithography.clone() { Some(value) => Some(value.0), None => None},
                 release_date: match apu.release_date.clone() { Some(value) => Some(value.0), None => None},
+                extras_by_section: HashMap::new(),
                 gpu_base_frequency: match apu.gpu_base_frequency.clone() { Some(value) => Some(value.0), None => None },
                 direct_x_support: match apu.direct_x_support.clone() { Some(value) => Some(value.0.clone()), None => None},
                 open_gl_support: match apu.open_gl_support.clone() { Some(value) => Some(value.0.clone()), None => None},
@@ -102,7 +105,22 @@ pub async fn handler(
     Path(name): Path<String>,
 ) -> Result<Protobuf<proto_specdb::query::Apu>, StatusCode> {
     match state.query_state.protobuf_apu_hashmap.get(&name) {
-        Some(value) => Ok(Protobuf(value.clone())),
+        Some(value) => {
+            let mut apu = value.clone();
+            let outer = state.query_state.extras_map.read().await;
+            if let Some(spec_map) = outer.get(&name) {
+                let mut extras_by_section: HashMap<String, SectionExtras> = HashMap::new();
+                for (section, section_map) in spec_map.iter() {
+                    let mut s = SectionExtras { extras: HashMap::new() };
+                    for (k, v) in section_map.iter() {
+                        s.extras.insert(k.clone(), v.clone());
+                    }
+                    extras_by_section.insert(section.clone(), s);
+                }
+                apu.extras_by_section = extras_by_section;
+            }
+            Ok(Protobuf(apu))
+        }
         None => Err(StatusCode::NOT_FOUND),
     }
 }

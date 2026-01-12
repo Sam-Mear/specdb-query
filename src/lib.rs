@@ -1,4 +1,6 @@
 use rapidhash::RapidHashMap;
+use tokio::sync::RwLock;
+use std::collections::HashMap;
 use specdb::SpecDb;
 
 use crate::queries::search::{PreProcessedState};
@@ -23,11 +25,14 @@ pub struct QueryState {
     pub protobuf_graphics_architecture_hashmap: RapidHashMap<String, proto_specdb::query::GraphicsArchitecture>,
     pub protobuf_apu_architecture_hashmap: RapidHashMap<String, proto_specdb::query::ApuArchitecture>,
     pub protobuf_generic_container_hashmap: RapidHashMap<String, proto_specdb::query::GenericContainer>,
+    // extras_map: spec_name -> section_header -> key -> Extra
+    pub extras_map: RwLock<HashMap<String, HashMap<String, HashMap<String, proto_specdb::query::Extra>>>>,
 }
 
 pub struct AppState {
     pub spec_db: SpecDb,
     pub query_state: QueryState,
+    pub allow_extras: bool,
 }
 
 pub fn get_query_state(specdb: &SpecDb) -> QueryState
@@ -43,5 +48,6 @@ pub fn get_query_state(specdb: &SpecDb) -> QueryState
         protobuf_graphics_architecture_hashmap: crate::queries::protobuf::graphics_architecture::get_state(&specdb),
         protobuf_apu_architecture_hashmap: crate::queries::protobuf::apu_architecture::get_state(&specdb),
         protobuf_generic_container_hashmap: crate::queries::protobuf::generic_container::get_state(&specdb),
+        extras_map: RwLock::new(HashMap::new()),
     }
 }

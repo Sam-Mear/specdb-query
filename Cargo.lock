@@ -1049,7 +1049,7 @@ dependencies = [
  "petgraph",
  "prettyplease",
  "prost 0.14.1",
- "prost-types",
+ "prost-types 0.14.1",
  "regex",
  "syn",
  "tempfile",
@@ -1079,6 +1079,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "prost-types"
+version = "0.13.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52c2c1bf36ddb1a1c396b3601a3cec27c2462e45f07c386894ec3ccf5332bd16"
+dependencies = [
+ "prost 0.13.5",
 ]
 
 [[package]]
@@ -1354,6 +1363,7 @@ dependencies = [
  "directories",
  "prost 0.13.5",
  "prost-build",
+ "prost-types 0.13.5",
  "rapidhash",
  "regex",
  "serde",

@@ -14,6 +14,7 @@ pub struct QueryRoot;
 
 struct Configuration {
     spec_db_path: String,
+    allow_extras: bool,
 }
 
 #[async_graphql::Object]
@@ -56,7 +57,7 @@ async fn main() {
     tracing_subscriber::fmt()
     .with_max_level(tracing::Level::DEBUG)
     .init();
-    let shared_state = Arc::new(AppState { spec_db: spec_db.clone(), query_state });
+    let shared_state = Arc::new(AppState { spec_db: spec_db.clone(), query_state, allow_extras: config.allow_extras });
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(spec_db)
         .finish();
@@ -77,7 +78,8 @@ async fn main() {
         .route("/v1/protobuf/graphics_architecture/{query}", get(specdb_query::queries::protobuf::graphics_architecture::handler).with_state(shared_state.clone()))
         .route("/v1/protobuf/apu_architecture/{query}", get(specdb_query::queries::protobuf::apu_architecture::handler).with_state(shared_state.clone()))
         .route("/v1/protobuf/generic_container/{query}", get(specdb_query::queries::protobuf::generic_container::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra", post(specdb_query::api::protobuf::extra::handler))
+        .route("/v1/protobuf/extra", post(specdb_query::api::protobuf::extra::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra/:spec_name", get(specdb_query::api::protobuf::extra::get_handler).with_state(shared_state.clone()))
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082
@@ -102,9 +104,15 @@ fn read_config() -> Configuration
             panic!("Config file at {} is empty", config_file.display());
         }
 
+        let spec_db_path = yaml[0]["spec_db_path"].as_str()
+            .expect(format!("spec_db_path not found in config file at {}", config_file.display()).as_str()).to_string();
+
+        // allow_extras defaults to false when not present
+        let allow_extras = yaml[0]["allow_extras"].as_bool().unwrap_or(false);
+
         return Configuration {
-            spec_db_path: yaml[0]["spec_db_path"].as_str()
-                .expect(format!("spec_db_path not found in config file at {}", config_file.display()).as_str()).to_string(),
+            spec_db_path,
+            allow_extras,
         };
     }
     panic!("Could not determine configuration directory");

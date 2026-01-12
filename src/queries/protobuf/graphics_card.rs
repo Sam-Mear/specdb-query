@@ -3,6 +3,8 @@ use std::sync::Arc;
 
 use axum::{extract::{Path, State}, http::StatusCode};
 use rapidhash::{HashMapExt, RapidHashMap};
+use std::collections::HashMap;
+use crate::proto_specdb::query::SectionExtras;
 use specdb::{SpecDb, spectype::Type};
 use axum_extra::protobuf::Protobuf;
 
@@ -13,7 +15,7 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::G
         let proto_spec = match &spec.part_type {
             Type::Cpu(_cpu) => None,
             Type::Apu(_apu) => None,
-            Type::GraphicsCard(graphics_card) => Some(proto_specdb::query::GraphicsCard{
+                Type::GraphicsCard(graphics_card) => Some(proto_specdb::query::GraphicsCard{
                 vram_capacity: graphics_card.vram_capacity.0.clone(),
                 shader_processor_count: graphics_card.shader_processor_count.0.clone(),
                 gpu_base_frequency: graphics_card.gpu_base_frequency.0.clone(),
@@ -58,6 +60,8 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::G
                 max_displays: match graphics_card.max_displays.clone() { Some(value) => Some(value.0.clone()), None => None},
                 crossfire_support: match graphics_card.crossfire_support.clone() { Some(value) => Some(value.0.clone()), None => None},
                 free_sync_support: match graphics_card.free_sync_support.clone() { Some(value) => Some(value.0.clone()), None => None}
+                ,
+                extras_by_section: HashMap::new()
             }),
             Type::CpuArchitecture(_cpu_architecture) => None,
             Type::ApuArchitecture(_apu_architecture) => None,
@@ -66,7 +70,7 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::G
             Type::Hidden(_inherit_data) => None,
         };
         match proto_spec {
-            Some(cpu) => map.insert(spec.name.clone(), cpu),
+                Some(cpu) => map.insert(spec.name.clone(), cpu),
             None => None
         };
     }
@@ -80,7 +84,22 @@ pub async fn handler(
     Path(name): Path<String>,
 ) -> Result<Protobuf<proto_specdb::query::GraphicsCard>, StatusCode> {
     match state.query_state.protobuf_graphics_card_hashmap.get(&name) {
-        Some(value) => Ok(Protobuf(value.clone())),
+        Some(value) => {
+            let mut card = value.clone();
+            let outer = state.query_state.extras_map.read().await;
+            if let Some(spec_map) = outer.get(&name) {
+                let mut extras_by_section: HashMap<String, SectionExtras> = HashMap::new();
+                for (section, section_map) in spec_map.iter() {
+                    let mut s = SectionExtras { extras: HashMap::new() };
+                    for (k, v) in section_map.iter() {
+                        s.extras.insert(k.clone(), v.clone());
+                    }
+                    extras_by_section.insert(section.clone(), s);
+                }
+                card.extras_by_section = extras_by_section;
+            }
+            Ok(Protobuf(card))
+        }
         None => Err(StatusCode::NOT_FOUND),
     }
 }
