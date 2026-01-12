@@ -4,7 +4,7 @@ use specdb::SpecDb;
 use crate::queries::search::{PreProcessedState};
 
 pub mod queries;
-pub mod addon;
+pub mod api;
 
 pub mod proto_specdb {
     pub mod query {

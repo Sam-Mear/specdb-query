@@ -2,8 +2,7 @@ use crate::AppState;
 use std::sync::Arc;
 
 use axum::{extract::{Path, State}, Json};
-use regex::RegexBuilder;
-use specdb::{SpecDb, SpecDbStruct};
+use specdb::{SpecDb};
 
 #[derive(Clone)]
 pub struct PreProcessedState {

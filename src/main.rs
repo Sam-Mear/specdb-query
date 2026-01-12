@@ -1,15 +1,12 @@
 use std::sync::Arc;
 use directories::ProjectDirs;
-use specdb_query::{AppState, get_query_state, queries::{full_specs, protobuf, search}};
-use axum::extract::Path;
+use specdb_query::{AppState, get_query_state, queries::{full_specs, search}};
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_axum::GraphQL;
 use axum::{
-    extract::State, routing::get, Json, Router, response::{self, IntoResponse}
+    Json, Router, extract::State, response::{self, IntoResponse}, routing::{get, post}
 };
-use regex::{Regex, RegexBuilder};
-use serde::{Serialize};
-use specdb::{get_spec_db, spectype::Cpu, SpecDb, SpecDbStruct};
+use specdb::{get_spec_db, SpecDb, SpecDbStruct};
 use tower_http::trace::TraceLayer;
 use yaml_rust2::YamlLoader;
 
@@ -80,6 +77,7 @@ async fn main() {
         .route("/v1/protobuf/graphics_architecture/{query}", get(specdb_query::queries::protobuf::graphics_architecture::handler).with_state(shared_state.clone()))
         .route("/v1/protobuf/apu_architecture/{query}", get(specdb_query::queries::protobuf::apu_architecture::handler).with_state(shared_state.clone()))
         .route("/v1/protobuf/generic_container/{query}", get(specdb_query::queries::protobuf::generic_container::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra", post(specdb_query::api::protobuf::extra::handler))
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082

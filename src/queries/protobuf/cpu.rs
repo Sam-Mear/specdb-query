@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use axum::{extract::{Path, State}, http::StatusCode};
 use rapidhash::{HashMapExt, RapidHashMap};
-use specdb::{SpecDb, SpecDbStruct, spectype::Type};
+use specdb::{SpecDb, spectype::Type};
 use axum_extra::protobuf::Protobuf;
 
 pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::Cpu>
@@ -58,13 +58,13 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::C
                 lithography: match cpu.lithography.clone() { Some(value) => Some(value.0), None => None},
                 release_date: match cpu.release_date.clone() { Some(value) => Some(value.0), None => None},
             }),
-            Type::Apu(apu) => None,
-            Type::GraphicsCard(graphics_card) => None,
-            Type::CpuArchitecture(cpu_architecture) => None,
-            Type::ApuArchitecture(apu_architecture) => None,
-            Type::GraphicsArchitecture(graphics_architecture) => None,
-            Type::GenericContainer(generic_container) => None,
-            Type::Hidden(inherit_data) => None,
+            Type::Apu(_apu) => None,
+            Type::GraphicsCard(_graphics_card) => None,
+            Type::CpuArchitecture(_cpu_architecture) => None,
+            Type::ApuArchitecture(_apu_architecture) => None,
+            Type::GraphicsArchitecture(_graphics_architecture) => None,
+            Type::GenericContainer(_generic_container) => None,
+            Type::Hidden(_inherit_data) => None,
         };
         match proto_spec {
             Some(cpu) => map.insert(spec.name.clone(), cpu),

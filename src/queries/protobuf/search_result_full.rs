@@ -1,9 +1,7 @@
 use crate::{AppState, proto_specdb::{self, query::{SearchResultFull, SearchResultFullList, search_result_full::FullSpecs}}};
 use std::sync::Arc;
 
-use axum::{Json, extract::{Path, State}, http::StatusCode};
-use regex::RegexBuilder;
-use specdb::{SpecDb, SpecDbStruct};
+use axum::{extract::{Path, State}, http::StatusCode};
 use axum_extra::protobuf::Protobuf;
 
 

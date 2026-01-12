@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use axum::{extract::{Path, State}, http::StatusCode};
 use rapidhash::{HashMapExt, RapidHashMap};
-use specdb::{SpecDb, SpecDbStruct, spectype::Type};
+use specdb::{SpecDb, spectype::Type};
 use axum_extra::protobuf::Protobuf;
 
 pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::GraphicsCard>
@@ -11,8 +11,8 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::G
     let mut map = RapidHashMap::<String, proto_specdb::query::GraphicsCard>::new();
     for spec in &specdb.files {
         let proto_spec = match &spec.part_type {
-            Type::Cpu(cpu) => None,
-            Type::Apu(apu) => None,
+            Type::Cpu(_cpu) => None,
+            Type::Apu(_apu) => None,
             Type::GraphicsCard(graphics_card) => Some(proto_specdb::query::GraphicsCard{
                 vram_capacity: graphics_card.vram_capacity.0.clone(),
                 shader_processor_count: graphics_card.shader_processor_count.0.clone(),
@@ -59,11 +59,11 @@ pub fn get_state(specdb: &SpecDb) -> RapidHashMap<String, proto_specdb::query::G
                 crossfire_support: match graphics_card.crossfire_support.clone() { Some(value) => Some(value.0.clone()), None => None},
                 free_sync_support: match graphics_card.free_sync_support.clone() { Some(value) => Some(value.0.clone()), None => None}
             }),
-            Type::CpuArchitecture(cpu_architecture) => None,
-            Type::ApuArchitecture(apu_architecture) => None,
-            Type::GraphicsArchitecture(graphics_architecture) => None,
-            Type::GenericContainer(generic_container) => None,
-            Type::Hidden(inherit_data) => None,
+            Type::CpuArchitecture(_cpu_architecture) => None,
+            Type::ApuArchitecture(_apu_architecture) => None,
+            Type::GraphicsArchitecture(_graphics_architecture) => None,
+            Type::GenericContainer(_generic_container) => None,
+            Type::Hidden(_inherit_data) => None,
         };
         match proto_spec {
             Some(cpu) => map.insert(spec.name.clone(), cpu),

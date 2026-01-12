@@ -1,9 +1,8 @@
 use crate::AppState;
 use std::sync::Arc;
 
-use axum::{extract::{Path, State}, Json};
-use regex::RegexBuilder;
-use specdb::{SpecDb, SpecDbStruct};
+use axum::{extract::{Path, State}};
+use specdb::{SpecDb};
 use axum_extra::protobuf::Protobuf;
 
 #[derive(Clone)]

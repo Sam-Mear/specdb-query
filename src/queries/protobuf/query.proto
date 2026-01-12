@@ -292,5 +292,17 @@ message Extra {
         string string_data = 101;
         uint32 int_data = 102;
         // repeated string repeated_string_data = 103 disabled for now 
+        bool bool_data = 104;
     }
+}
+
+
+// ---------------------------
+// REQUESTS FROM CLIENT
+// ---------------------------
+
+message AddExtra {
+    SpecType type = 1;
+    string key = 2;
+    Extra data = 3;
 }
