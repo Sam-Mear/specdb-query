@@ -191,6 +191,12 @@ class GraphicsCard extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string free_sync_support = 44;</code>
      */
     protected $free_sync_support = null;
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     */
+    private $extras_by_section;
 
     /**
      * Constructor.
@@ -242,6 +248,8 @@ class GraphicsCard extends \Google\Protobuf\Internal\Message
      *     @type string $max_displays
      *     @type string $crossfire_support
      *     @type string $free_sync_support
+     *     @type array|\Google\Protobuf\Internal\MapField $extras_by_section
+     *           Extras attached to this spec, grouped by section header
      * }
      */
     public function __construct($data = NULL) {
@@ -1573,6 +1581,32 @@ class GraphicsCard extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->free_sync_support = $var;
+
+        return $this;
+    }
+
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getExtrasBySection()
+    {
+        return $this->extras_by_section;
+    }
+
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
+     * @return $this
+     */
+    public function setExtrasBySection($var)
+    {
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \SpecDb\Query\SectionExtras::class);
+        $this->extras_by_section = $arr;
 
         return $this;
     }

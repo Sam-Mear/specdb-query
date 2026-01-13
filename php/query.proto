@@ -5,6 +5,9 @@ package specdb.query;
 option php_namespace = "SpecDb\\Query";
 option php_metadata_namespace = "SpecDb\\Metadata";
 
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
 
 // /v1/protobuf/search/{query}
 message SearchResultList {
@@ -108,6 +111,8 @@ message GraphicsCard {
 
     optional string crossfire_support = 43;
     optional string free_sync_support = 44;
+    // Extras attached to this spec, grouped by section header
+    map<string, SectionExtras> extras_by_section = 100;
 }
 
 // /v1/protobuf/cpu/{query}
@@ -166,6 +171,8 @@ message Cpu {
     optional string architecture = 43;
     optional string lithography = 44;
     optional string release_date = 45;
+    // Extras attached to this spec, grouped by section header
+    map<string, SectionExtras> extras_by_section = 100;
 }
 
 // /v1/protobuf/apu/{query}
@@ -186,6 +193,8 @@ message Apu {
     optional string l2_cache_total = 11;
     optional string l3_cache_total = 12;
     optional string memory_type = 13;
+    // Extras attached to this spec, grouped by section header
+    map<string, SectionExtras> extras_by_section = 100;
 
     optional uint32 pcie_5_0_lanes = 14;
     optional uint32 pcie_4_0_lanes = 15;
@@ -284,4 +293,85 @@ message GenericContainer {
 message Section {
     string header = 1;
     repeated string members = 2;
+    map<string, Extra> extras = 3;
+}
+
+message Extra {
+    // Optional namespace for typed extras (e.g. "benchmarks.v1").
+    string namespace = 1;
+
+    oneof value {
+        string string_value = 10;
+        int64 int_value = 11;
+        double double_value = 12;
+        bool bool_value = 13;
+        google.protobuf.Struct object_value = 15;
+        bytes bytes_value = 16;
+    }
+
+    // For lists of numeric metrics (cannot be inside a oneof)
+    repeated double double_list = 17;
+
+    // Version/metadata to help with concurrency and auditing.
+    uint64 version = 20;
+    google.protobuf.Timestamp updated_at = 21;
+    string source = 22;
+}
+
+
+// ---------------------------
+// REQUESTS FROM CLIENT
+// ---------------------------
+
+message AddExtraRequest {
+    // Identify the target spec and section to attach the extra to.
+    string spec_name = 1;
+    string section_header = 2;
+
+    // Key within the section.extras map
+    string key = 3;
+
+    // The typed extra payload (namespace + value + metadata)
+    Extra extra = 4;
+
+    // Concurrency / behavior controls
+    bool overwrite = 5;
+    uint64 expected_version = 6;
+    string idempotency_key = 7;
+}
+
+message AddExtraResponse {
+    bool ok = 1;
+    string message = 2;
+    uint64 version = 3;
+    Extra extra = 4;
+}
+
+message RemoveExtraRequest {
+    string spec_name = 1;
+    string section_header = 2;
+    string key = 3;
+    uint64 expected_version = 4;
+    string idempotency_key = 5;
+}
+
+message RemoveExtraResponse {
+    bool ok = 1;
+    string message = 2;
+}
+
+// Retrieve extras for a spec (optionally for a specific section)
+message GetExtrasRequest {
+    string spec_name = 1;
+    // optional: if empty, return extras for all sections for this spec
+    string section_header = 2;
+}
+
+message GetExtrasResponse {
+    // Map from section_header -> map<key, Extra>
+    map<string, SectionExtras> extras_by_section = 1;
+}
+
+message SectionExtras {
+    map<string, Extra> extras = 1;
 }

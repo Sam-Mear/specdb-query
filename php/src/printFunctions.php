@@ -75,6 +75,19 @@ class SpecDbPrinter {
 
 
         <?php
+        // Display extras attached to this CPU
+        $extrasMap = $cpu->getExtrasBySection();
+        if ($extrasMap) {
+            echo '<h4>Extras</h4>';
+            foreach ($extrasMap as $sectionHeader => $sectionExtras) {
+                echo '<strong>' . htmlspecialchars($sectionHeader) . '</strong>';
+                echo '<ul>';
+                foreach ($sectionExtras->getExtras() as $k => $extra) {
+                    echo '<li>' . htmlspecialchars($k) . ': ' . htmlspecialchars($this->formatExtra($extra)) . '</li>';
+                }
+                echo '</ul>';
+            }
+        }
     }
 
     public function printGraphicsCardDetails(GraphicsCard $graphicsCard) {
@@ -133,6 +146,19 @@ class SpecDbPrinter {
                 <tr><td>FreeSync Support</td><td><?= htmlspecialchars($graphicsCard->getFreeSyncSupport()) ?></td></tr>
             </tbody>
         </table> <?php
+        // Display extras for graphics card
+        $extrasMap = $graphicsCard->getExtrasBySection();
+        if ($extrasMap) {
+            echo '<h4>Extras</h4>';
+            foreach ($extrasMap as $sectionHeader => $sectionExtras) {
+                echo '<strong>' . htmlspecialchars($sectionHeader) . '</strong>';
+                echo '<ul>';
+                foreach ($sectionExtras->getExtras() as $k => $extra) {
+                    echo '<li>' . htmlspecialchars($k) . ': ' . htmlspecialchars($this->formatExtra($extra)) . '</li>';
+                }
+                echo '</ul>';
+            }
+        }
     }
 
     public function printApuDetails(Apu $apu) {
@@ -219,6 +245,19 @@ class SpecDbPrinter {
                 <tr><td>FreeSync Support</td><td><?= htmlspecialchars($apu->getFreeSyncSupport()) ?></td></tr>
             </tbody>
         </table> <?php
+        // Display extras for APU
+        $extrasMap = $apu->getExtrasBySection();
+        if ($extrasMap) {
+            echo '<h4>Extras</h4>';
+            foreach ($extrasMap as $sectionHeader => $sectionExtras) {
+                echo '<strong>' . htmlspecialchars($sectionHeader) . '</strong>';
+                echo '<ul>';
+                foreach ($sectionExtras->getExtras() as $k => $extra) {
+                    echo '<li>' . htmlspecialchars($k) . ': ' . htmlspecialchars($this->formatExtra($extra)) . '</li>';
+                }
+                echo '</ul>';
+            }
+        }
     }
 
     public function printCpuArchitectureDetails(CpuArchitecture $cpuArchitecture) {
@@ -245,6 +284,18 @@ class SpecDbPrinter {
                 </td></tr>
             </tbody>
         </table> <?php
+        // Display extras for GenericContainer sections
+        foreach ($genericContainer->getSections() as $section) {
+            $extras = $section->getExtras();
+            if ($extras) {
+                echo '<h4>Extras for ' . htmlspecialchars($section->getHeader()) . '</h4>';
+                echo '<ul>';
+                foreach ($extras as $k => $extra) {
+                    echo '<li>' . htmlspecialchars($k) . ': ' . htmlspecialchars($this->formatExtra($extra)) . '</li>';
+                }
+                echo '</ul>';
+            }
+        }
     }
 
     public function printGraphicsArchitectureDetails(GraphicsArchitecture $graphicsArchitecture) {
@@ -328,6 +379,32 @@ class SpecDbPrinter {
                 </td></tr>
             </tbody>
         </table> <?php
+    }
+
+    private function formatExtra(\SpecDb\Query\Extra $extra) {
+        if ($extra->hasStringValue()) {
+            return $extra->getStringValue();
+        }
+        if ($extra->hasIntValue()) {
+            return (string)$extra->getIntValue();
+        }
+        if ($extra->hasDoubleValue()) {
+            return (string)$extra->getDoubleValue();
+        }
+        if ($extra->hasBoolValue()) {
+            return $extra->getBoolValue() ? 'true' : 'false';
+        }
+        $dbl = $extra->getDoubleList();
+        if ($dbl && count(iterator_to_array($dbl)) > 0) {
+            return implode(', ', iterator_to_array($dbl));
+        }
+        if ($extra->hasBytesValue()) {
+            return base64_encode($extra->getBytesValue());
+        }
+        if ($extra->hasObjectValue()) {
+            return '(object)';
+        }
+        return '(unknown)';
     }
 
 }

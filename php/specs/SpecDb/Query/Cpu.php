@@ -201,6 +201,12 @@ class Cpu extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string release_date = 45;</code>
      */
     protected $release_date = null;
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     */
+    private $extras_by_section;
 
     /**
      * Constructor.
@@ -256,6 +262,8 @@ class Cpu extends \Google\Protobuf\Internal\Message
      *     @type string $architecture
      *     @type string $lithography
      *     @type string $release_date
+     *     @type array|\Google\Protobuf\Internal\MapField $extras_by_section
+     *           Extras attached to this spec, grouped by section header
      * }
      */
     public function __construct($data = NULL) {
@@ -1641,6 +1649,32 @@ class Cpu extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->release_date = $var;
+
+        return $this;
+    }
+
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getExtrasBySection()
+    {
+        return $this->extras_by_section;
+    }
+
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
+     * @return $this
+     */
+    public function setExtrasBySection($var)
+    {
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \SpecDb\Query\SectionExtras::class);
+        $this->extras_by_section = $arr;
 
         return $this;
     }

@@ -11,7 +11,58 @@ use SpecDb\Query\SpecType;
 
 include(getcwd().'/../bootstrap.php');
 
+// Handle AddExtra form submission
+$addExtraMessage = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_extra') {
+    try {
+        $req = new \SpecDb\Query\AddExtraRequest();
+        $req->setSpecName($_POST['spec_name'] ?? '');
+        $req->setSectionHeader($_POST['section_header'] ?? '');
+        $req->setKey($_POST['key'] ?? '');
+
+        $extra = new \SpecDb\Query\Extra();
+        if (!empty($_POST['namespace'])) {
+            $extra->setNamespace($_POST['namespace']);
+        }
+        // For this example we only support string extras via the form
+        if (isset($_POST['string_value'])) {
+            $extra->setStringValue($_POST['string_value']);
+        }
+        $req->setExtra($extra);
+
+        $client = new \GuzzleHttp\Client();
+        $response = $client->post('http://localhost:8082/v1/protobuf/extra', [
+            'body' => $req->serializeToString(),
+            'headers' => ['Content-Type' => 'application/octet-stream']
+        ]);
+
+        $respBody = $response->getBody()->getContents();
+        $addResp = new \SpecDb\Query\AddExtraResponse();
+        $addResp->mergeFromString($respBody);
+        $addExtraMessage = 'Added: ' . ($addResp->getOk() ? 'ok' : 'failed') . ' - ' . $addResp->getMessage();
+    } catch (GuzzleException $e) {
+        $addExtraMessage = 'Request failed: ' . $e->getMessage();
+    }
+}
+
 $specPrinter = new SpecDbPrinter();
+
+// Simple form for adding an extra
+if ($addExtraMessage !== null) {
+    echo '<div style="padding:10px;background:#efe;">' . htmlspecialchars($addExtraMessage) . '</div>';
+}
+?>
+<h3>Add Extra (example)</h3>
+<form method="post">
+    <input type="hidden" name="action" value="add_extra">
+    <input type="text" name="spec_name" placeholder="Spec name (exact)" required>
+    <input type="text" name="section_header" placeholder="Section header (e.g. 'Performance')" required>
+    <input type="text" name="key" placeholder="Key (e.g. 'bench.1')" required>
+    <input type="text" name="namespace" placeholder="Namespace (optional)">
+    <input type="text" name="string_value" placeholder="String value (example)">
+    <button type="submit">Add Extra</button>
+</form>
+<?php
 
 // Iterate results
 foreach (getSearch()->getResults() as $result) {

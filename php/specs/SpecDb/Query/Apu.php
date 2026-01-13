@@ -70,6 +70,12 @@ class Apu extends \Google\Protobuf\Internal\Message
      */
     protected $memory_type = null;
     /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     */
+    private $extras_by_section;
+    /**
      * Generated from protobuf field <code>optional uint32 pcie_5_0_lanes = 14;</code>
      */
     protected $pcie_5_0_lanes = null;
@@ -308,6 +314,8 @@ class Apu extends \Google\Protobuf\Internal\Message
      *     @type string $l2_cache_total
      *     @type string $l3_cache_total
      *     @type string $memory_type
+     *     @type array|\Google\Protobuf\Internal\MapField $extras_by_section
+     *           Extras attached to this spec, grouped by section header
      *     @type int $pcie_5_0_lanes
      *     @type int $pcie_4_0_lanes
      *     @type int $pcie_3_0_lanes
@@ -747,6 +755,32 @@ class Apu extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->memory_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getExtrasBySection()
+    {
+        return $this->extras_by_section;
+    }
+
+    /**
+     * Extras attached to this spec, grouped by section header
+     *
+     * Generated from protobuf field <code>map<string, .specdb.query.SectionExtras> extras_by_section = 100;</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
+     * @return $this
+     */
+    public function setExtrasBySection($var)
+    {
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \SpecDb\Query\SectionExtras::class);
+        $this->extras_by_section = $arr;
 
         return $this;
     }

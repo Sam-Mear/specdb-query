@@ -21,6 +21,10 @@ class Section extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated string members = 2;</code>
      */
     private $members;
+    /**
+     * Generated from protobuf field <code>map<string, .specdb.query.Extra> extras = 3;</code>
+     */
+    private $extras;
 
     /**
      * Constructor.
@@ -30,6 +34,7 @@ class Section extends \Google\Protobuf\Internal\Message
      *
      *     @type string $header
      *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $members
+     *     @type array|\Google\Protobuf\Internal\MapField $extras
      * }
      */
     public function __construct($data = NULL) {
@@ -77,6 +82,28 @@ class Section extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
         $this->members = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>map<string, .specdb.query.Extra> extras = 3;</code>
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getExtras()
+    {
+        return $this->extras;
+    }
+
+    /**
+     * Generated from protobuf field <code>map<string, .specdb.query.Extra> extras = 3;</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
+     * @return $this
+     */
+    public function setExtras($var)
+    {
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \SpecDb\Query\Extra::class);
+        $this->extras = $arr;
 
         return $this;
     }

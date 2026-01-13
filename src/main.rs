@@ -79,7 +79,7 @@ async fn main() {
         .route("/v1/protobuf/apu_architecture/{query}", get(specdb_query::queries::protobuf::apu_architecture::handler).with_state(shared_state.clone()))
         .route("/v1/protobuf/generic_container/{query}", get(specdb_query::queries::protobuf::generic_container::handler).with_state(shared_state.clone()))
         .route("/v1/protobuf/extra", post(specdb_query::api::protobuf::extra::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra/:spec_name", get(specdb_query::api::protobuf::extra::get_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra/{spec_name}", get(specdb_query::api::protobuf::extra::get_handler).with_state(shared_state.clone()))
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082
