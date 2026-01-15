@@ -285,7 +285,7 @@ class SpecDbPrinter {
             </tbody>
         </table> <?php
         // Display extras for GenericContainer sections
-        foreach ($genericContainer->getSections() as $section) {
+        foreach ($cpuArchitecture->getSections() as $section) {
             $extras = $section->getExtras();
             if ($extras) {
                 echo '<h4>Extras for ' . htmlspecialchars($section->getHeader()) . '</h4>';
