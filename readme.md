@@ -1,3 +1,8 @@
+## pre requisites
+
+cli `protoc` is needed to compile. [instalation guide](https://protobuf.dev/installation/).
+
+## graphql example
 ```
 {
 	specDb{

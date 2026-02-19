@@ -1,0 +1,13 @@
+[Unit]
+Description=SpecDB Api Service
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=specdb
+Group=specdb
+WorkingDirectory=/home/specdb/specdb-query/
+ExecStart=/home/specdb/specdb-query/target/release/specdb-query
+[Install]
+WantedBy=multi-user.target

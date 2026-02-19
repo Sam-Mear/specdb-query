@@ -1,15 +1,12 @@
 use std::sync::Arc;
 use directories::ProjectDirs;
-use specdb_query::{get_query_state, queries::{search, full_specs}, AppState};
-use axum::extract::Path;
+use specdb_query::{AppState, get_query_state, queries::{full_specs, search}};
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_axum::GraphQL;
 use axum::{
-    extract::State, routing::get, Json, Router, response::{self, IntoResponse}
+    Json, Router, extract::State, response::{self, IntoResponse}, routing::{get, post}
 };
-use regex::{Regex, RegexBuilder};
-use serde::{Serialize};
-use specdb::{get_spec_db, spectype::Cpu, SpecDb, SpecDbStruct};
+use specdb::{get_spec_db, SpecDb, SpecDbStruct};
 use tower_http::trace::TraceLayer;
 use yaml_rust2::YamlLoader;
 
@@ -17,6 +14,7 @@ pub struct QueryRoot;
 
 struct Configuration {
     spec_db_path: String,
+    allow_extras: bool,
 }
 
 #[async_graphql::Object]
@@ -59,7 +57,7 @@ async fn main() {
     tracing_subscriber::fmt()
     .with_max_level(tracing::Level::DEBUG)
     .init();
-    let shared_state = Arc::new(AppState { spec_db: spec_db.clone(), query_state });
+    let shared_state = Arc::new(AppState { spec_db: spec_db.clone(), query_state, allow_extras: config.allow_extras });
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(spec_db)
         .finish();
@@ -71,6 +69,21 @@ async fn main() {
         .route("/", get(full_specs::handler_root).with_state(shared_state.clone()))
         .route("/v1/search/{query}", get(search::search_handler).with_state(shared_state.clone()))
         .route("/v1/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/search/{query}", get(specdb_query::queries::protobuf::search::search_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/search_full_specs/{query}", get(specdb_query::queries::protobuf::search_result_full::search_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/cpu/{query}", get(specdb_query::queries::protobuf::cpu::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/graphics_card/{query}", get(specdb_query::queries::protobuf::graphics_card::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/apu/{query}", get(specdb_query::queries::protobuf::apu::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/cpu_architecture/{query}", get(specdb_query::queries::protobuf::cpu_architecture::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/graphics_architecture/{query}", get(specdb_query::queries::protobuf::graphics_architecture::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/apu_architecture/{query}", get(specdb_query::queries::protobuf::apu_architecture::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/generic_container/{query}", get(specdb_query::queries::protobuf::generic_container::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra", post(specdb_query::api::protobuf::extra::handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra/{spec_name}", get(specdb_query::api::protobuf::extra::get_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra/export/{spec_name}", get(specdb_query::api::protobuf::extra::export_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra/import/{spec_name}", post(specdb_query::api::protobuf::extra::import_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra/export_all", get(specdb_query::api::protobuf::extra::export_all_handler).with_state(shared_state.clone()))
+        .route("/v1/protobuf/extra/import_all", post(specdb_query::api::protobuf::extra::import_all_handler).with_state(shared_state.clone()))
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082
@@ -95,9 +108,15 @@ fn read_config() -> Configuration
             panic!("Config file at {} is empty", config_file.display());
         }
 
+        let spec_db_path = yaml[0]["spec_db_path"].as_str()
+            .expect(format!("spec_db_path not found in config file at {}", config_file.display()).as_str()).to_string();
+
+        // allow_extras defaults to false when not present
+        let allow_extras = yaml[0]["allow_extras"].as_bool().unwrap_or(false);
+
         return Configuration {
-            spec_db_path: yaml[0]["spec_db_path"].as_str()
-                .expect(format!("spec_db_path not found in config file at {}", config_file.display()).as_str()).to_string(),
+            spec_db_path,
+            allow_extras,
         };
     }
     panic!("Could not determine configuration directory");

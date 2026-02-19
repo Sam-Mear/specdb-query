@@ -9,4 +9,5 @@ curl -w @- -o /dev/null -s "$@" <<'EOF'
  time_starttransfer:  %{time_starttransfer}\n
                     ----------\n
          time_total:  %{time_total}\n
+   response_size(B):  %{size_download}\n
 EOF
