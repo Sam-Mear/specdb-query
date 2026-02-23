@@ -65,7 +65,8 @@ async fn main() {
     // println!("Files parsed total: {}", spec_db.files.iter().count());
 
     // build our application with a single route
-    let app = Router::new().route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
+    let app = Router::new()
+        // .route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
         .route("/", get(full_specs::handler_root).with_state(shared_state.clone()))
         .route("/v1/search/{query}", get(search::search_handler).with_state(shared_state.clone()))
         .route("/v1/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))
