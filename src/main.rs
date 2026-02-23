@@ -67,24 +67,24 @@ async fn main() {
     // build our application with a single route
     let app = Router::new()
         // .route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
-        .route("/", get(full_specs::handler_root).with_state(shared_state.clone()))
-        .route("/v1/search/{query}", get(search::search_handler).with_state(shared_state.clone()))
-        .route("/v1/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/search/{query}", get(specdb_query::queries::protobuf::search::search_handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/search_full_specs/{query}", get(specdb_query::queries::protobuf::search_result_full::search_handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/cpu/{query}", get(specdb_query::queries::protobuf::cpu::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/graphics_card/{query}", get(specdb_query::queries::protobuf::graphics_card::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/apu/{query}", get(specdb_query::queries::protobuf::apu::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/cpu_architecture/{query}", get(specdb_query::queries::protobuf::cpu_architecture::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/graphics_architecture/{query}", get(specdb_query::queries::protobuf::graphics_architecture::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/apu_architecture/{query}", get(specdb_query::queries::protobuf::apu_architecture::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/generic_container/{query}", get(specdb_query::queries::protobuf::generic_container::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra", post(specdb_query::api::protobuf::extra::handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra/{spec_name}", get(specdb_query::api::protobuf::extra::get_handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra/export/{spec_name}", get(specdb_query::api::protobuf::extra::export_handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra/import/{spec_name}", post(specdb_query::api::protobuf::extra::import_handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra/export_all", get(specdb_query::api::protobuf::extra::export_all_handler).with_state(shared_state.clone()))
-        .route("/v1/protobuf/extra/import_all", post(specdb_query::api::protobuf::extra::import_all_handler).with_state(shared_state.clone()))
+        .route("/", get(full_specs::handler_root).with_state(shared_state.clone()))// JSON
+        .route("/v1/search/{query}", get(search::search_handler).with_state(shared_state.clone()))// JSON
+        .route("/v1/spec/{name}", get(full_specs::handler).with_state(shared_state.clone()))// JSON 
+        .route("/v1/protobuf/search/{query}", get(specdb_query::queries::protobuf::search::search_handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/search_full_specs/{query}", get(specdb_query::queries::protobuf::search_result_full::search_handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/cpu/{query}", get(specdb_query::queries::protobuf::cpu::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/graphics_card/{query}", get(specdb_query::queries::protobuf::graphics_card::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/apu/{query}", get(specdb_query::queries::protobuf::apu::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/cpu_architecture/{query}", get(specdb_query::queries::protobuf::cpu_architecture::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/graphics_architecture/{query}", get(specdb_query::queries::protobuf::graphics_architecture::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/apu_architecture/{query}", get(specdb_query::queries::protobuf::apu_architecture::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/generic_container/{query}", get(specdb_query::queries::protobuf::generic_container::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/extra", post(specdb_query::api::protobuf::extra::handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/extra/{spec_name}", get(specdb_query::api::protobuf::extra::get_handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/extra/export/{spec_name}", get(specdb_query::api::protobuf::extra::export_handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/extra/import/{spec_name}", post(specdb_query::api::protobuf::extra::import_handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/extra/export_all", get(specdb_query::api::protobuf::extra::export_all_handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
+        .route("/v1/protobuf/extra/import_all", post(specdb_query::api::protobuf::extra::import_all_handler).with_state(shared_state.clone())) // PROTOBUF. See proto file.
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 8082

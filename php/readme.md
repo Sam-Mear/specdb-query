@@ -1,13 +1,10 @@
-`protoc --php_out=specs query.proto`
+The files generated in `php/specs/SpecDb` were generated with: `protoc --php_out=specs query.proto`
 
-// if response is not 200, the api might return a different message 
+Start with php/src/pub/index.php to understand how this works.
 
-    // message ErrorResponse {
-    //     ErrorEnum code = 1;        // e.g., HTTP or app-specific code
-    //     string message = 2;    // Human-readable
-    //     repeated string details = 3; // Optional extra info
-    // }
-    // enum ErrorEnum {
-    //     NO_RESULTS = 0;
-    //     UNKNOWN = 7;
-    // }
+## Getting started
+
+1. Run SpecDB Query.
+2. `cd src/pub`
+3. `php -S localhost:8080`
+4. head to `locolhost:8080` in your browser.
