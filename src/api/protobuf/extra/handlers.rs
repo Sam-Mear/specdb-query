@@ -15,6 +15,11 @@ pub async fn handler(
     if !state.allow_extras { return Err(StatusCode::FORBIDDEN); }
     if payload.spec_name.is_empty() { return Err(StatusCode::BAD_REQUEST); }
     if payload.key.is_empty() { return Err(StatusCode::BAD_REQUEST); }
+    
+    // respond error if spec_name is not found in specdb
+    if !state.spec_db.files.iter().any(|spec| spec.name == payload.spec_name) {
+        return Err(StatusCode::NOT_FOUND);
+    }
     let extra = match payload.extra { Some(e) => e, None => return Err(StatusCode::BAD_REQUEST) };
 
     let mut outer = state.query_state.extras_map.write().await;
