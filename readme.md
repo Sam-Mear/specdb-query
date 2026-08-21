@@ -14,6 +14,10 @@ Goals:
 
 The intended usecase is with protobufs. The JSON API is for quickly searching/experimenting with the database as a human.
 
+## Prerequisites
+
+A cloning of [SpecDB-rs](https://github.com/Sam-Mear/specdb-rs)
+
 ## Api implementation referenece
 
 cli `protoc` is needed to compile. [instalation guide](https://protobuf.dev/installation/). With this, you can generate SpecDB objects in most languages.
