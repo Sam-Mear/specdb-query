@@ -14,9 +14,7 @@ Goals:
 
 The intended usecase is with protobufs. The JSON API is for quickly searching/experimenting with the database as a human.
 
-## Prerequisites
-
-A cloning of [SpecDB-rs](https://github.com/Sam-Mear/specdb-rs)
+A public API can be found at [api.specdb.info](http://api.specdb.info)
 
 ## Api implementation referenece
 
@@ -51,17 +49,19 @@ There are more endpoints for adding additional data for the service. These are l
 
 ## Quickstart — Build & Run (Rust)
 
-Prerequisites:
+### Prerequisites
+
+- A cloning of [SpecDB-rs](https://github.com/Sam-Mear/specdb-rs)
 - Rust toolchain (rustc + cargo)
 
-Build and run (development):
+### Build and run (development):
 
 ```bash
 cargo build
 cargo run --release
 ```
 
-Notes:
+### Notes:
 - The server reads `config.yaml` from the OS project config directory. On first run it creates an empty file — populate it with `spec_db_path` before starting.
 - The server binds to `0.0.0.0:8082` by default (see `src/main.rs`).
 
